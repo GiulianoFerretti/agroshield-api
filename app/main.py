@@ -23,3 +23,5 @@ def db_check():
 @app.get("/users-count")
 def users_count(db: Session = Depends(get_db)):
     return {"users": db.query(User).count()}
+from app.auth import router as auth_router
+app.include_router(auth_router)
