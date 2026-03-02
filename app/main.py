@@ -3,12 +3,12 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 import os
 
-from .db import engine, get_db, Base
-from .models import User
+from app.db import engine, get_db, Base
+from app.models import User
 
 app = FastAPI()
 
-# 🔹 Criar tabelas automaticamente ao subir a aplicação
+# cria as tabelas na subida
 Base.metadata.create_all(bind=engine)
 
 
