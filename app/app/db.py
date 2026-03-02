@@ -2,15 +2,28 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
-SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
-
 class Base(DeclarativeBase):
     pass
 
+_engine = None
+_SessionLocal = None
+
+def _ensure():
+    global _engine, _SessionLocal
+    if _engine is None:
+        database_url = os.getenv("DATABASE_URL")
+        if not database_url:
+            raise RuntimeError("DATABASE_URL não configurada no serviço agroshield-api (Railway → Variáveis).")
+        _engine = create_engine(database_url, pool_pre_ping=True)
+        _SessionLocal = sessionmaker(bind=_engine, autocommit=False, autoflush=False)
+    return _engine, _SessionLocal
+
+def get_engine():
+    eng, _ = _ensure()
+    return eng
+
 def get_db():
+    _, SessionLocal = _ensure()
     db = SessionLocal()
     try:
         yield db
