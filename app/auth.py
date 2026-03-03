@@ -19,6 +19,17 @@ def register(
     payload: RegisterInput,
     db: Session = Depends(get_db)
 ):
+
+
+p = payload.password
+raise HTTPException(
+    status_code=500,
+    detail={
+        "chars": len(p),
+        "bytes": len(p.encode("utf-8")),
+        "repr": repr(p),
+    },
+)
     try:
         existing = db.query(User).filter(User.email == payload.email).first()
         if existing:
