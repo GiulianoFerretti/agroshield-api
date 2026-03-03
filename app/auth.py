@@ -16,7 +16,6 @@ class RegisterInput(BaseModel):
     name: str
     email: str
     password: str
-
 @router.post("/register")
 def register(
     payload: RegisterInput,
@@ -39,6 +38,15 @@ def register(
         db.commit()
         db.refresh(user)
 
+@router.post("/login")
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Credenciais inválidas")
+
+    token = create_access_token(subject=user.email)
+    return {"access_token": token, "token_type": "bearer"}
+        
         return {"message": "Usuário criado com sucesso"}
 
     except Exception as e:
