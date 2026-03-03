@@ -7,7 +7,6 @@ from app.security import hash_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-
 @router.post("/register")
 def register(
     name: str,
