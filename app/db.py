@@ -1,29 +1,20 @@
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-class Base(DeclarativeBase):
-    pass
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./dev.db")
 
-_engine = None
-_SessionLocal = None
+connect_args = {}
+if DATABASE_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
 
-def _ensure():
-    global _engine, _SessionLocal
-    if _engine is None:
-        database_url = os.getenv("DATABASE_URL")
-        if not database_url:
-            raise RuntimeError("DATABASE_URL não configurada no serviço agroshield-api.")
-        _engine = create_engine(database_url, pool_pre_ping=True)
-        _SessionLocal = sessionmaker(bind=_engine, autocommit=False, autoflush=False)
-    return _engine, _SessionLocal
+engine = create_engine(DATABASE_URL, connect_args=connect_args, pool_pre_ping=True)
 
-def get_engine():
-    eng, _ = _ensure()
-    return eng
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
 
 def get_db():
-    _, SessionLocal = _ensure()
     db = SessionLocal()
     try:
         yield db
