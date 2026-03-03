@@ -15,20 +15,24 @@ def register(
     password: str,
     db: Session = Depends(get_db)
 ):
-    existing = db.query(User).filter(User.email == email).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Email já cadastrado")
+    try:
+        existing = db.query(User).filter(User.email == email).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Email já cadastrado")
 
-    user = User(
-        name=name,
-        email=email,
-        password_hash=hash_password(password),
-        role="admin",
-        is_active=True
-    )
+        user = User(
+            name=name,
+            email=email,
+            password_hash=hash_password(password),
+            role="admin",
+            is_active=True
+        )
 
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
 
-    return {"message": "Usuário criado com sucesso"}
+        return {"message": "Usuário criado com sucesso"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
