@@ -8,6 +8,26 @@ from app.security import hash_password, verify_password, create_access_token, de
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> User:
+    email = decode_access_token(token)
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Usuário não encontrado")
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Conta desativada")
+    return user
+
+
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Acesso restrito a administradores")
+    return current_user
+
+
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
@@ -55,19 +75,12 @@ def login(
 
 
 @router.get("/me")
-def me(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
-):
-    email = decode_access_token(token)
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+def me(current_user: User = Depends(get_current_user)):
     return {
-        "id": user.id,
-        "name": user.name,
-        "email": user.email,
-        "role": user.role,
-        "is_active": user.is_active,
-        "created_at": user.created_at,
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "role": current_user.role,
+        "is_active": current_user.is_active,
+        "created_at": current_user.created_at,
     }
