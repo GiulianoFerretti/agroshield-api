@@ -26,7 +26,6 @@ def register(
         name=name,
         email=email,
         password_hash=hash_password(password),
-        role="admin",
         is_active=True
     )
 

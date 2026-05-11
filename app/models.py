@@ -13,7 +13,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String, nullable=False)
 
-    role: Mapped[str] = mapped_column(String, default="admin")
+    role: Mapped[str] = mapped_column(String, default="user")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     created_at: Mapped[str] = mapped_column(DateTime(timezone=True), server_default=func.now())
