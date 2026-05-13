@@ -10,7 +10,7 @@ from alembic import context
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app.db import Base          # metadata de todos os models
-from app.models import User      # registra User no Base.metadata
+from app.models import User, Client  # registra models no Base.metadata
 from app.config import settings  # lê DATABASE_URL do .env
 
 # Objeto de configuração do Alembic (lê alembic.ini)

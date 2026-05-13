@@ -2,11 +2,10 @@ from fastapi import FastAPI, Depends
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.db import engine, get_db, Base
-from app.models import User, Client
+from app.db import engine, get_db
+from app.models import User
 
 app = FastAPI()
-Base.metadata.create_all(bind=engine)
 
 @app.get("/health")
 def health():
