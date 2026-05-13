@@ -24,7 +24,9 @@ from app.auth import router as auth_router
 from app.admin import router as admin_router
 from app.clients import router as clients_router
 from app.rural_properties import router as rural_properties_router
+from app.questions import router as questions_router
 app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(clients_router)
 app.include_router(rural_properties_router)
+app.include_router(questions_router)
