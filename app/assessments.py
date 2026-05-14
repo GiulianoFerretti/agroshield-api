@@ -162,11 +162,50 @@ def get_assessment_report(
             "weight": answer.weight,
         })
 
+    recommendations = []
+
+    high_risk_answers = [
+        item for item in report_answers
+        if item["weight"] >= 0.75
+    ]
+
+    if assessment.risk_level == "critical":
+        recommendations.append({
+            "priority": "critical",
+            "title": "Immediate action recommended",
+            "description": "The assessment indicates critical risk. Prioritize correction of the highest-risk items before audits, inspections, new contracts, or operational expansion."
+        })
+    elif assessment.risk_level == "high":
+        recommendations.append({
+            "priority": "high",
+            "title": "Priority correction plan",
+            "description": "The assessment indicates high risk. Prepare a correction plan with responsible parties, deadlines, and documentary evidence."
+        })
+    elif assessment.risk_level == "medium":
+        recommendations.append({
+            "priority": "medium",
+            "title": "Preventive monitoring",
+            "description": "The assessment indicates medium risk. Review documents, internal controls, and evidence before the risk level increases."
+        })
+    elif assessment.risk_level == "low":
+        recommendations.append({
+            "priority": "low",
+            "title": "Maintain compliance",
+            "description": "The assessment indicates low risk. Keep documents updated and perform periodic monitoring."
+        })
+
+    for item in high_risk_answers:
+        recommendations.append({
+            "priority": "high",
+            "title": "Critical item identified",
+            "description": f"The answer '{item['selected_answer']}' to the question '{item['question']}' has risk weight {item['weight']}. Treat this item as a correction priority."
+        })
+
     risk_messages = {
-        "low": "A avaliação indica risco baixo.",
-        "medium": "A avaliação indica risco médio.",
-        "high": "A avaliação indica risco alto.",
-        "critical": "A avaliação indica risco crítico.",
+        "low": "The assessment indicates low risk.",
+        "medium": "The assessment indicates medium risk.",
+        "high": "The assessment indicates high risk.",
+        "critical": "The assessment indicates critical risk.",
     }
 
     return {
@@ -187,11 +226,12 @@ def get_assessment_report(
             "total_area_hectares": prop.total_area_hectares,
         },
         "answers": report_answers,
+        "recommendations": recommendations,
         "summary": {
             "risk_level": assessment.risk_level,
             "message": risk_messages.get(
                 assessment.risk_level,
-                "A avaliação ainda não possui classificação de risco.",
+                "The assessment does not have a risk classification yet.",
             ),
         },
     }
