@@ -85,3 +85,35 @@ class AnswerOption(Base):
 
     created_at: Mapped[str] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[str] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+class Assessment(Base):
+    __tablename__ = "assessments"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False, index=True)
+    rural_property_id: Mapped[str] = mapped_column(String, ForeignKey("rural_properties.id"), nullable=False, index=True)
+
+    status: Mapped[str] = mapped_column(String, nullable=False, default="draft")
+    total_score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    risk_level: Mapped[str | None] = mapped_column(String, nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    created_at: Mapped[str] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[str] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class AssessmentAnswer(Base):
+    __tablename__ = "assessment_answers"
+    __table_args__ = (
+        UniqueConstraint("assessment_id", "question_id", name="uq_assessment_answers_assessment_question"),
+    )
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    assessment_id: Mapped[str] = mapped_column(String, ForeignKey("assessments.id"), nullable=False, index=True)
+    question_id: Mapped[str] = mapped_column(String, ForeignKey("questions.id"), nullable=False, index=True)
+    answer_option_id: Mapped[str] = mapped_column(String, ForeignKey("answer_options.id"), nullable=False, index=True)
+
+    weight: Mapped[float] = mapped_column(Float, nullable=False)
+
+    created_at: Mapped[str] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[str] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
