@@ -127,6 +127,74 @@ def get_assessment(
     return _get_owned_assessment(assessment_id, current_user, db)
 
 
+
+@router.get("/{assessment_id}/report")
+def get_assessment_report(
+    assessment_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    assessment = _get_owned_assessment(assessment_id, current_user, db)
+
+    prop = db.query(RuralProperty).filter(
+        RuralProperty.id == assessment.rural_property_id,
+    ).first()
+    if not prop:
+        raise HTTPException(status_code=404, detail="Rural property not found")
+
+    answers = (
+        db.query(AssessmentAnswer)
+        .filter(AssessmentAnswer.assessment_id == assessment_id)
+        .all()
+    )
+
+    report_answers = []
+
+    for answer in answers:
+        question = db.query(Question).filter(Question.id == answer.question_id).first()
+        option = db.query(AnswerOption).filter(AnswerOption.id == answer.answer_option_id).first()
+
+        report_answers.append({
+            "question_id": answer.question_id,
+            "question": question.text if question else None,
+            "answer_option_id": answer.answer_option_id,
+            "selected_answer": option.text if option else None,
+            "weight": answer.weight,
+        })
+
+    risk_messages = {
+        "low": "A avaliação indica risco baixo.",
+        "medium": "A avaliação indica risco médio.",
+        "high": "A avaliação indica risco alto.",
+        "critical": "A avaliação indica risco crítico.",
+    }
+
+    return {
+        "assessment": {
+            "id": assessment.id,
+            "status": assessment.status,
+            "total_score": assessment.total_score,
+            "risk_level": assessment.risk_level,
+            "created_at": assessment.created_at,
+            "updated_at": assessment.updated_at,
+        },
+        "property": {
+            "id": prop.id,
+            "name": prop.name,
+            "city": prop.city,
+            "state": prop.state,
+            "main_activity": prop.main_activity,
+            "total_area_hectares": prop.total_area_hectares,
+        },
+        "answers": report_answers,
+        "summary": {
+            "risk_level": assessment.risk_level,
+            "message": risk_messages.get(
+                assessment.risk_level,
+                "A avaliação ainda não possui classificação de risco.",
+            ),
+        },
+    }
 @router.post("/{assessment_id}/answers", status_code=201)
 def upsert_assessment_answer(
     assessment_id: str,
