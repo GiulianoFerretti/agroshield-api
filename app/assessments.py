@@ -172,40 +172,40 @@ def get_assessment_report(
     if assessment.risk_level == "critical":
         recommendations.append({
             "priority": "critical",
-            "title": "Immediate action recommended",
-            "description": "The assessment indicates critical risk. Prioritize correction of the highest-risk items before audits, inspections, new contracts, or operational expansion."
+            "title": "Atua\u00e7\u00e3o imediata recomendada",
+            "description": "A avalia\u00e7\u00e3o indica risco cr\u00edtico. Recomenda-se priorizar a regulariza\u00e7\u00e3o documental, ambiental e operacional dos itens de maior peso antes de auditorias, fiscaliza\u00e7\u00f5es, novas contrata\u00e7\u00f5es ou expans\u00e3o das atividades."
         })
     elif assessment.risk_level == "high":
         recommendations.append({
             "priority": "high",
-            "title": "Priority correction plan",
-            "description": "The assessment indicates high risk. Prepare a correction plan with responsible parties, deadlines, and documentary evidence."
+            "title": "Plano de corre\u00e7\u00e3o priorit\u00e1rio",
+            "description": "A avalia\u00e7\u00e3o indica risco alto. Recomenda-se elaborar plano de corre\u00e7\u00e3o com respons\u00e1veis definidos, prazos objetivos e comprova\u00e7\u00e3o documental das medidas adotadas."
         })
     elif assessment.risk_level == "medium":
         recommendations.append({
             "priority": "medium",
-            "title": "Preventive monitoring",
-            "description": "The assessment indicates medium risk. Review documents, internal controls, and evidence before the risk level increases."
+            "title": "Monitoramento preventivo",
+            "description": "A avalia\u00e7\u00e3o indica risco m\u00e9dio. Recomenda-se revisar documentos, controles internos e evid\u00eancias antes que os pontos de aten\u00e7\u00e3o evoluam para risco elevado."
         })
     elif assessment.risk_level == "low":
         recommendations.append({
             "priority": "low",
-            "title": "Maintain compliance",
-            "description": "The assessment indicates low risk. Keep documents updated and perform periodic monitoring."
+            "title": "Manuten\u00e7\u00e3o da conformidade",
+            "description": "A avalia\u00e7\u00e3o indica risco baixo. Recomenda-se manter a documenta\u00e7\u00e3o atualizada e realizar monitoramento peri\u00f3dico."
         })
 
     for item in high_risk_answers:
         recommendations.append({
             "priority": "high",
-            "title": "Critical item identified",
-            "description": f"The answer '{item['selected_answer']}' to the question '{item['question']}' has risk weight {item['weight']}. Treat this item as a correction priority."
+            "title": "Item cr\u00edtico identificado",
+            "description": f"A resposta '{item['selected_answer']}' para a pergunta '{item['question']}' possui peso de risco {item['weight']}. Recomenda-se tratar este item como prioridade de regulariza\u00e7\u00e3o."
         })
 
     risk_messages = {
-        "low": "The assessment indicates low risk.",
-        "medium": "The assessment indicates medium risk.",
-        "high": "The assessment indicates high risk.",
-        "critical": "The assessment indicates critical risk.",
+        "low": "A avalia\u00e7\u00e3o indica risco baixo.",
+        "medium": "A avalia\u00e7\u00e3o indica risco m\u00e9dio.",
+        "high": "A avalia\u00e7\u00e3o indica risco alto.",
+        "critical": "A avalia\u00e7\u00e3o indica risco cr\u00edtico.",
     }
 
     return {
@@ -231,7 +231,7 @@ def get_assessment_report(
             "risk_level": assessment.risk_level,
             "message": risk_messages.get(
                 assessment.risk_level,
-                "The assessment does not have a risk classification yet.",
+                "A avalia\u00e7\u00e3o ainda n\u00e3o possui classifica\u00e7\u00e3o de risco.",
             ),
         },
     }
